@@ -60,7 +60,7 @@ static void sntp_time_sync_obtain_time(void)
 	{
 		sntp_time_sync_init_sntp();
 		// Set the local time zone
-		setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
+		setenv("TZ", "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00", 1);
 		tzset();
 	}
 }
@@ -101,6 +101,23 @@ char* sntp_time_sync_get_time(void)
 	}
 
 	return time_buffer;
+}
+
+
+unsigned sntp_time_sync_get_timestamp(void)
+{
+	struct tm time_info = {0};
+	time_t now = 0;
+	unsigned ts = (unsigned)time(&now);
+	localtime_r(&now, &time_info);
+
+	if (time_info.tm_year < (2016 - 1900))
+	{
+		ESP_LOGI(TAG, "Time is not set yet");
+		ts = 0;
+	}
+
+	return ts;
 }
 
 void sntp_time_sync_task_start(void)
