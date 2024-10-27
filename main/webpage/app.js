@@ -4,6 +4,7 @@
 var seconds 	= null;
 var otaTimerVar =  null;
 var wifiConnectInterval = null;
+var sensorChart = null;
 
 /**
  * Initialize functions here.
@@ -11,6 +12,7 @@ var wifiConnectInterval = null;
 $(document).ready(function(){
 	getSSID();
 	getUpdateStatus();
+	initializeChart();
 	startDHTSensorInterval();
 	startLocalTimeInterval();
 	getConnectInfo();
@@ -19,8 +21,8 @@ $(document).ready(function(){
 	}); 
 	$("#disconnect_wifi").on("click", function(){
 		disconnectWifi();
-	}); 
-});   
+	});
+});
 
 /**
  * Gets file name and size for display on the web page.
@@ -128,14 +130,29 @@ function otaRebootTimer()
 }
 
 /**
- * Gets DHT22 sensor temperature and humidity values for display on the web page.
+ * Gets DHT22 sensor temperature and humidity values.
  */
 function getDHTSensorValues()
 {
+	// return $.getJSON('/dhtSensor.json');
 	$.getJSON('/dhtSensor.json', function(data) {
+
 		$("#temperature_reading").text(data["temp"]);
 		$("#humidity_reading").text(data["humidity"]);
+		updateChartValues(data["temp"], data["humidity"]);
 	});
+}
+
+/**
+ * Update  sensor values on the web page.
+ */
+function updateChartValues(newTemperature, newHumidity)
+{
+	const newLabel = new Date();
+	sensorChart.data.labels.push(newLabel);
+	sensorChart.data.datasets[0].data.push(newTemperature);
+	sensorChart.data.datasets[1].data.push(newHumidity);
+	sensorChart.update();
 }
 
 /**
@@ -143,7 +160,8 @@ function getDHTSensorValues()
  */
 function startDHTSensorInterval()
 {
-	setInterval(getDHTSensorValues, 5000);    
+	getDHTSensorValues();
+	setInterval(getDHTSensorValues, 5000);
 }
 
 /**
@@ -310,6 +328,7 @@ function disconnectWifi()
  */
 function startLocalTimeInterval()
 {
+	getLocalTime();
 	setInterval(getLocalTime, 10000);
 }
 
@@ -334,23 +353,75 @@ function getSSID()
 	});
 }
 
-
-
-
-
-
-
+/**
+ * Initialize DHT22 sensor chart
+ */
+function initializeChart()
+{
+    let ctx = document.getElementById("sensors_chart").getContext('2d');
     
+    // Sample data
+    let data = {
+        //labels: [new Date()],
+        datasets: [
+        {
+            yAxisID: 'left',
+            label: "Temperature",
+            fill: false,
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)'
+        },
+        {
+            yAxisID: 'right',
+            label: "Humidity",
+            fill: false,
+            backgroundColor: 'rgb(99, 255, 132)',
+            borderColor: 'rgb(99, 255, 132)'
+        }]
+    };
 
-
-
-
-
-
-
-
-
-
-    
-
+    sensorChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: {
+            animation: false,
+            responsive: false,
+            scales: {
+                left: {
+                    type: 'linear',
+                    position: 'left',
+                    ticks: { 
+                        beginAtZero: true, 
+                        color: 'rgb(255, 99, 132)' 
+                    },
+                    grid: { display: false }
+                },
+                right: {
+                    type: 'linear',
+                    position: 'right',
+                    ticks: { 
+                        beginAtZero: true, 
+                        color: 'rgb(99, 255, 132)' 
+                    },
+                    grid: { display: false }
+                },
+                x: {
+                    type: 'time',
+                    parsing: false,
+                    ticks: {
+                        beginAtZero: true,
+                        autoSkip: true,
+                        maxRotation: 10,
+                    },
+                    time: {
+                        unit: 'second',
+                        displayFormats: {
+                            second: "hh:mm:ss a"
+                    	}
+                	},
+            	}
+        	}
+    	}
+    });
+}
 

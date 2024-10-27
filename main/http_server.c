@@ -63,6 +63,14 @@ extern const uint8_t app_js_end[]					asm("_binary_app_js_end");
 extern const uint8_t favicon_ico_start[]			asm("_binary_favicon_ico_start");
 extern const uint8_t favicon_ico_end[]				asm("_binary_favicon_ico_end");
 
+extern const uint8_t chart_js_start[]               asm("_binary_chart_min_js_start");
+extern const uint8_t chart_js_end[]                 asm("_binary_chart_min_js_end");
+extern const uint8_t chartjs_adapter_start[]        asm("_binary_chartjs_adapter_date_fns_bundle_min_js_start");
+extern const uint8_t chartjs_adapter_end[]          asm("_binary_chartjs_adapter_date_fns_bundle_min_js_end");
+extern const uint8_t date_fns_start[]               asm("_binary_date_fns_min_js_start");
+extern const uint8_t date_fns_end[]                 asm("_binary_date_fns_min_js_end");
+
+
 /**
  * Checks the g_fw_update_status and creates the fw_update_reset timer if g_fw_update_status is true.
  */
@@ -100,7 +108,8 @@ static void http_server_monitor(void *parameter)
 					ESP_LOGI(TAG, "HTTP_MSG_WIFI_CONNECT_INIT");
 					
 					g_wifi_connect_status = HTTP_WIFI_STATUS_CONNECTING;
-					break;
+
+					break;
 
 				case HTTP_MSG_WIFI_CONNECT_SUCCESS:
 					ESP_LOGI(TAG, "HTTP_MSG_WIFI_CONNECT_SUCCESS");
@@ -160,6 +169,51 @@ static esp_err_t http_server_jquery_handler(httpd_req_t *req)
 
 	httpd_resp_set_type(req, "application/javascript");
 	httpd_resp_send(req, (const char *)jquery_3_3_1_min_js_start, jquery_3_3_1_min_js_end - jquery_3_3_1_min_js_start);
+
+	return ESP_OK;
+}
+
+/**
+ * Chart get handler is requested when accessing the web page.
+ * @param req HTTP request for which the uri needs to be handled.
+ * @return ESP_OK
+ */
+static esp_err_t http_server_chart_handler(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "chart.min.js requested");
+
+	httpd_resp_set_type(req, "application/javascript");
+	httpd_resp_send(req, (const char *)chart_js_start, chart_js_end - chart_js_start);
+
+	return ESP_OK;
+}
+
+/**
+ * chartjs-adapter get handler is requested when accessing the web page.
+ * @param req HTTP request for which the uri needs to be handled.
+ * @return ESP_OK
+ */
+static esp_err_t http_server_chartjs_adapter_handler(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "chartjs-adapter-date-fns.bundle.min.js requested");
+
+	httpd_resp_set_type(req, "application/javascript");
+	httpd_resp_send(req, (const char *)chartjs_adapter_start, chartjs_adapter_end - chartjs_adapter_start);
+
+	return ESP_OK;
+}
+
+/**
+ * date-fns get handler is requested when accessing the web page.
+ * @param req HTTP request for which the uri needs to be handled.
+ * @return ESP_OK
+ */
+static esp_err_t http_server_date_fns_handler(httpd_req_t *req)
+{
+	ESP_LOGI(TAG, "date-fns.min.js requested");
+
+	httpd_resp_set_type(req, "application/javascript");
+	httpd_resp_send(req, (const char *)date_fns_start, date_fns_end - date_fns_start);
 
 	return ESP_OK;
 }
@@ -278,7 +332,7 @@ esp_err_t http_server_OTA_update_handler(httpd_req_t *req)
 			}
 			else
 			{
-				printf("http_server_OTA_update_handler: Writing to partition subtype %d at offset 0x%lx\r\n", update_partition->subtype, update_partition->address);
+				printf("http_server_OTA_update_handler: Writing to partition subtype %d at offset 0x%x\r\n", update_partition->subtype, update_partition->address);
 			}
 
 			// Write this first part of the data
@@ -300,7 +354,7 @@ esp_err_t http_server_OTA_update_handler(httpd_req_t *req)
 		if (esp_ota_set_boot_partition(update_partition) == ESP_OK)
 		{
 			const esp_partition_t *boot_partition = esp_ota_get_boot_partition();
-			ESP_LOGI(TAG, "http_server_OTA_update_handler: Next boot partition subtype %d at offset 0x%lx", boot_partition->subtype, boot_partition->address);
+			ESP_LOGI(TAG, "http_server_OTA_update_handler: Next boot partition subtype %d at offset 0x%x", boot_partition->subtype, boot_partition->address);
 			flash_successful = true;
 		}
 		else
@@ -570,6 +624,33 @@ static httpd_handle_t http_server_configure(void)
 				.user_ctx = NULL
 		};
 		httpd_register_uri_handler(http_server_handle, &jquery_js);
+
+		// register chart.js handler
+		httpd_uri_t chart_js = {
+				.uri = "/chart.min.js",
+				.method = HTTP_GET,
+				.handler = http_server_chart_handler,
+				.user_ctx = NULL
+		};
+		httpd_register_uri_handler(http_server_handle, &chart_js);
+
+		// register chartjs-adapter-date-fns.bundle.min.js handler
+		httpd_uri_t chartjs_adapter = {
+				.uri = "/chartjs-adapter-date-fns.bundle.min.js",
+				.method = HTTP_GET,
+				.handler = http_server_chartjs_adapter_handler,
+				.user_ctx = NULL
+		};
+		httpd_register_uri_handler(http_server_handle, &chartjs_adapter);
+
+		// register date-fns.min.js handler
+		httpd_uri_t date_fns = {
+				.uri = "/date-fns.min.js",
+				.method = HTTP_GET,
+				.handler = http_server_date_fns_handler,
+				.user_ctx = NULL
+		};
+		httpd_register_uri_handler(http_server_handle, &date_fns);
 
 		// register index.html handler
 		httpd_uri_t index_html = {
