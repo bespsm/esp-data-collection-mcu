@@ -10,6 +10,7 @@
 #include "freertos/semphr.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "esp_rom_gpio.h"
 
 #include "tasks_common.h"
 #include "wifi_app.h"

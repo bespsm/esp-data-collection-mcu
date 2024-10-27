@@ -5,19 +5,26 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 
-#include "aws_iot.h"
+#include "mqtt_esp_client.h"
 #include "DHT22.h"
 #include "sntp_time_sync.h"
 #include "wifi_app.h"
 #include "wifi_reset_button.h"
+#include "prometheus_pusher.h"
 
 static const char TAG[] = "main";
+
 
 void wifi_application_connected_events(void)
 {
 	ESP_LOGI(TAG, "WiFi Application Connected!!");
 	sntp_time_sync_task_start();
-	aws_iot_start();
+
+	// Start local mqqt client
+	// mqtt_esp_client_start();
+
+	// Start Prometheus gatewaypush task
+	prometheus_pusher_start();
 }
 
 void app_main(void)

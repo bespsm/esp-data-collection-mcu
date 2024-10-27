@@ -19,4 +19,11 @@ void sntp_time_sync_task_start(void);
  */
 char* sntp_time_sync_get_time(void);
 
+
+/**
+ * Returns local timestamp if set.
+ * @return local timestamp.
+ */
+unsigned sntp_time_sync_get_timestamp(void);
+
 #endif /* MAIN_SNTP_TIME_SYNC_H_ */
