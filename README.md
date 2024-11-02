@@ -18,6 +18,6 @@ This is a clone of [Udemy IoT Application Development with the ESP32 Using the E
 - edit `CONFIG_MQTT_CLIENT_ID`, `CONFIG_MQTT_HOSTNAME`, `CONFIG_MQTT_TOPIC` macros to set up MQTT tasks in [mqtt_esp_client.h](main/mqtt_esp_client.h)
 
 - edit `PROMETHEUS_PUSHGATEWAY_HOST`, `PROMETHEUS_PUSHGATEWAY_PORT`  macros to set up prometheus pusher task in [prometheus_pusher.h](main/prometheus_pusher.h)
-- edit `RGB_LED_RED_GPIO`, `RGB_LED_GREEN_GPIO`, `RGB_LED_BLUE_GPIO` macros to adapt your HW configuration to RGB LED in [rgb_led.h](main/rgb_led.h) or remove (rgb_led.c)[main/rgb_led.c] from [main/CMakeLists.txt] and its usage from the code if you don't have RGB LED connected
+- edit `RGB_LED_RED_GPIO`, `RGB_LED_GREEN_GPIO`, `RGB_LED_BLUE_GPIO` macros to adapt your HW configuration to RGB LED in [rgb_led.h](main/rgb_led.h) or remove [rgb_led.c](main/rgb_led.c) from [CMakeLists.txt](main/CMakeLists.txt) and its usage from the code if you don't have RGB LED connected
 - edit `WIFI_*` macros to set upi WI-FI configuration in [wifi_app.h](main/wifi_app.h)
 - run `idf.py menuconfig` to adapt further your HW configuration
