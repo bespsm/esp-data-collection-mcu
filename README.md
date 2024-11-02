@@ -19,3 +19,5 @@ This is a clone of [Udemy IoT Application Development with the ESP32 Using the E
 - edit `RGB_LED_RED_GPIO`, `RGB_LED_GREEN_GPIO`, `RGB_LED_BLUE_GPIO` macros to adapt your HW configuration to RGB LED in [rgb_led.h](main/rgb_led.h)
 - edit `WIFI_*` macros to set upi WI-FI configuration in [wifi_app.h](main/wifi_app.h)
 - run `idf.py menuconfig` to adapt further your HW configuration
+
+**This project is developed based on ESP-IDF version 4.4**
